@@ -14,7 +14,7 @@ app.set('view engine', 'ejs');
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(express.static("public"));
 
-mongoose.connect("mongodb+srv://stevenkelvin:XxuVuEP8vv6bDko8@cluster0.jtqkgzp.mongodb.net/", { useNewUrlParser: true });
+mongoose.connect("mongodb+srv://stevenkelvin:J3xEha3qYImOn6Tk@cluster0.jtqkgzp.mongodb.net/?retryWrites=true&w=majority", { useNewUrlParser: true });
 
 const userScheme = new mongoose.Schema({
     email: String,
@@ -98,7 +98,7 @@ app.route("/secrets")
 
 let port = process.env.PORT;
 if (port == null || port == "") {
-  port = 3000;
+  port = 8000;
 }
 
 app.listen(port,function (req, res) {
