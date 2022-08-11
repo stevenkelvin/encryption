@@ -64,7 +64,7 @@ app.route("/register")
     User.findOne({email: req.body.username}, function (err, foundedUser) {
         if(!err){
             if(!foundedUser){
-                if(req.body.password != ""){
+                if(req.body.password.length >= 8){
                     if(req.body.password === req.body.confirmPassword){
                         const newUser = new User({
                             email: req.body.username,
@@ -79,13 +79,14 @@ app.route("/register")
                     }
                     else
                         res.render("registerPasswordWarning");
-                }
+                } 
+                else if(req.body.password.length < 8 && req.body.password.length > 0)
+                    res.render("registerPasswordTooShort");
                 else
                     res.render("registerNoPasswordAndEmail");
             }
-            else{
+            else
                 res.render("registerWarning"); 
-            }
         }
     });  
 });
@@ -93,7 +94,8 @@ app.route("/register")
 app.route("/secrets")
 .get(function (req, res) {
     res.render("secrets");
-})
+});
+
 
 app.listen(3000,function (req, res) {
     console.log("Server has started successfully.");
