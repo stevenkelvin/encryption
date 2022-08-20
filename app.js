@@ -3,7 +3,9 @@ const express = require("express");
 const bodyParser = require("body-parser");
 const ejs = require("ejs");
 const mongoose = require("mongoose");
-const md5 = require("md5");
+const bcrypt = require("bcrypt");
+const saltRounds = 10;
+
 
 
 
@@ -41,10 +43,12 @@ app.route("/login")
                 if(req.body.password == "")
                     res.render("loginNoPassword");  
                 if(foundedUser){
-                    if(foundedUser.password == md5(req.body.password))
-                        res.redirect("/secrets");
-                    else
-                        res.render("loginWrongPassword");   
+                    bcrypt.compare(req.body.password, foundedUser.password, function (err, result) {
+                        if(result)
+                            res.redirect("/secrets");
+                        else(!result)
+                            res.render("loginWrongPassword");
+                    });     
                 }
                 else
                     res.render("loginUserWarning");
@@ -62,32 +66,34 @@ app.route("/register")
 
 .post(function (req, res) {
     User.findOne({email: req.body.username}, function (err, foundedUser) {
-        if(!err){
-            if(!foundedUser){
-                if(req.body.password.length >= 8){
-                    if(req.body.password === req.body.confirmPassword){
-                        const newUser = new User({
-                            email: req.body.username,
-                            password: md5(req.body.password)
-                        });
-                        newUser.save(function (err){
-                            if(err)
-                                res.send(err);
-                            else
-                            res.redirect("/secrets");
-                        });
-                    }
+        bcrypt.hash(req.body.password, saltRounds, function (err, hash) {
+            if(!err){
+                if(!foundedUser){
+                    if(req.body.password.length >= 8){
+                        if(req.body.password === req.body.confirmPassword){
+                            const newUser = new User({
+                                email: req.body.username,
+                                password: hash
+                            });
+                            newUser.save(function (err){
+                                if(err)
+                                    res.send(err);
+                                else
+                                res.redirect("/secrets");
+                            });
+                        }
+                        else
+                            res.render("registerPasswordWarning");
+                    } 
+                    else if(req.body.password.length < 8 && req.body.password.length > 0)
+                        res.render("registerPasswordTooShort");
                     else
-                        res.render("registerPasswordWarning");
-                } 
-                else if(req.body.password.length < 8 && req.body.password.length > 0)
-                    res.render("registerPasswordTooShort");
+                        res.render("registerNoPasswordAndEmail");
+                }
                 else
-                    res.render("registerNoPasswordAndEmail");
+                    res.render("registerWarning"); 
             }
-            else
-                res.render("registerWarning"); 
-        }
+        });
     });  
 });
 
