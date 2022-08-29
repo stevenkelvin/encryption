@@ -17,7 +17,7 @@ app.use(bodyParser.urlencoded({extended: true}));
 app.use(express.static("public"));
 
 app.use(session({
-    secret: process.env.GOOGLE_CLIENT_SECRET,
+    secret: "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",
     resave: false,
     saveUninitialized: false
 }));
