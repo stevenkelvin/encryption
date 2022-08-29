@@ -121,13 +121,12 @@ app.route("/register")
     }
 });
 
-app.route("/auth/google/secrets")
-.get(function (req, res) {
-    if(req.isAuthenticated())
-        res.render("secrets");
-    else
-        res.redirect("/login");
-});
+app.get('/auth/google/secret', 
+  passport.authenticate('google', { failureRedirect: '/login' }),
+  function(req, res) {
+    // Successful authentication, redirect home.
+    res.render('/secret');
+  });
 
 app.route("/logout")
 .get(function (req, res) {
