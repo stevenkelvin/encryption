@@ -58,6 +58,7 @@ passport.use(new GoogleStrategy({
 app.route("/")
 .get(function (req, res) {
     res.render("home");
+    console.log(process.env.GOOGLE_CLIENT_SECRET);
 });
 
 app.route("/login")
@@ -121,7 +122,7 @@ app.route("/register")
     }
 });
 
-app.get('/auth/google/secret', 
+app.get('/auth/google/secrets', 
   passport.authenticate('google', { failureRedirect: '/login' }),
   function(req, res) {
     // Successful authentication, redirect home.
@@ -149,5 +150,3 @@ if (port == null || port == "") {
 app.listen(port,function (req, res) {
     console.log("Server has started successfully.");
 });
-
-console.log(process.env.GOOGLE_CLIENT_SECRET);
