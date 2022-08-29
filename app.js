@@ -3,6 +3,7 @@ const express = require("express");
 const bodyParser = require("body-parser");
 const ejs = require("ejs");
 const mongoose = require("mongoose");
+require(dotenv).config();
 const session = require("express-session"); 
 const passport = require("passport");
 const passportLocalMongoose = require("passport-local-mongoose");
