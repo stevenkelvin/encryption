@@ -44,8 +44,8 @@ passport.serializeUser(User.serializeUser());
 passport.deserializeUser(User.deserializeUser());
 
 passport.use(new GoogleStrategy({
-    clientID: process.env.GOOGLE_CLIENT_ID,
-    clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+    clientID: "814085782991-p8pqh8qqltkshpb2le5a5ksa76jm2h9l.apps.googleusercontent.com",
+    clientSecret: "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",
     callbackURL: "https://secrets-leungkakit.herokuapp.com/auth/google/secrets"
   },
   function(accessToken, refreshToken, profile, cb) {
