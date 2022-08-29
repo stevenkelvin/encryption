@@ -58,7 +58,6 @@ passport.use(new GoogleStrategy({
 app.route("/")
 .get(function (req, res) {
     res.render("home");
-    console.log(process.env.GOOGLE_CLIENT_SECRET);
 });
 
 app.route("/login")
@@ -122,12 +121,13 @@ app.route("/register")
     }
 });
 
-app.get('/auth/google/secrets', 
-  passport.authenticate('google', { failureRedirect: '/login' }),
-  function(req, res) {
-    // Successful authentication, redirect home.
-    res.render('/secret');
-  });
+app.route("/secrets")
+.get(function (req, res) {
+    if(req.isAuthenticated())
+        res.render("secrets");
+    else
+        res.redirect("/login");
+});
 
 app.route("/logout")
 .get(function (req, res) {
@@ -139,8 +139,15 @@ app.route("/logout")
     
 });
 
-app.get('/auth/google',
-  passport.authenticate('google', { scope: ['profile'] }));
+app.get("/auth/google",
+  passport.authenticate("google", { scope: ["profile"] }));
+
+  app.get("/auth/google/secrets", 
+  passport.authenticate("google", { failureRedirect: "/login" }),
+  function(req, res) {
+    // Successful authentication, redirect home.
+    res.redirect("/secrets");
+  });
 
 let port = process.env.PORT;
 if (port == null || port == "") {
