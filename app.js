@@ -3,9 +3,11 @@ const express = require("express");
 const bodyParser = require("body-parser");
 const ejs = require("ejs");
 const mongoose = require("mongoose");
-const session = require('express-session'); 
+const session = require("express-session"); 
 const passport = require("passport");
 const passportLocalMongoose = require("passport-local-mongoose");
+const GoogleStrategy = require("passport-google-oauth20").Strategy;
+const findOrCreate = require("mongoose-findorcreate");
 
 const app = express();
 
@@ -15,13 +17,14 @@ app.use(bodyParser.urlencoded({extended: true}));
 app.use(express.static("public"));
 
 app.use(session({
-    secret: "UVpSJcCaMq.",
+    secret: process.env.GOOGLE_CLIENT_SECRET,
     resave: false,
     saveUninitialized: false
 }));
 
 app.use(passport.initialize());
 app.use(passport.session());
+
 
 mongoose.connect("mongodb+srv://stevenkelvin:J3xEha3qYImOn6Tk@cluster0.jtqkgzp.mongodb.net/?retryWrites=true&w=majority", { useNewUrlParser: true });
 
@@ -31,6 +34,7 @@ const userScheme = new mongoose.Schema({
 });
 
 userScheme.plugin(passportLocalMongoose);
+userScheme.plugin(findOrCreate);
 
 const User = mongoose.model("User", userScheme);
 
@@ -39,7 +43,17 @@ passport.use(User.createStrategy());
 passport.serializeUser(User.serializeUser());
 passport.deserializeUser(User.deserializeUser());
 
-
+passport.use(new GoogleStrategy({
+    clientID: process.env.GOOGLE_CLIENT_ID,
+    clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+    callbackURL: "https://secrets-leungkakit.herokuapp.com/auth/google/secrets"
+  },
+  function(accessToken, refreshToken, profile, cb) {
+    User.findOrCreate({ googleId: profile.id }, function (err, user) {
+      return cb(err, user);
+    });
+  }
+));
 
 app.route("/")
 .get(function (req, res) {
@@ -107,7 +121,7 @@ app.route("/register")
     }
 });
 
-app.route("/secrets")
+app.route("/auth/google/secrets")
 .get(function (req, res) {
     if(req.isAuthenticated())
         res.render("secrets");
@@ -123,6 +137,11 @@ app.route("/logout")
         }
     });
     
+});
+
+app.route("/auth/google")
+.get(function (req, res) {
+    passport.authenticate("google", { scope: ["profile"] });
 });
 
 let port = process.env.PORT;
