@@ -3,7 +3,6 @@ const express = require("express");
 const bodyParser = require("body-parser");
 const ejs = require("ejs");
 const mongoose = require("mongoose");
-require(dotenv).config();
 const session = require("express-session"); 
 const passport = require("passport");
 const passportLocalMongoose = require("passport-local-mongoose");
@@ -140,10 +139,8 @@ app.route("/logout")
     
 });
 
-app.route("/auth/google")
-.get(function (req, res) {
-    passport.authenticate("google", { scope: ["profile"] });
-});
+app.get('/auth/google',
+  passport.authenticate('google', { scope: ['profile'] }));
 
 let port = process.env.PORT;
 if (port == null || port == "") {
