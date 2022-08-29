@@ -149,3 +149,5 @@ if (port == null || port == "") {
 app.listen(port,function (req, res) {
     console.log("Server has started successfully.");
 });
+
+console.log(process.env.GOOGLE_CLIENT_SECRET);
