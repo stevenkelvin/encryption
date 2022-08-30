@@ -8,6 +8,7 @@ const session = require("express-session");
 const passport = require("passport");
 const passportLocalMongoose = require("passport-local-mongoose");
 const GoogleStrategy = require("passport-google-oauth20").Strategy;
+const FacebookStrategy = require("passport-facebook").Strategy;
 const findOrCreate = require("mongoose-findorcreate");
 
 const app = express();
@@ -31,7 +32,9 @@ mongoose.connect("mongodb+srv://stevenkelvin:J3xEha3qYImOn6Tk@cluster0.jtqkgzp.m
 
 const userScheme = new mongoose.Schema({
     email: String,
-    password: String
+    password: String,
+    googleId: String,
+    facebookId: String
 });
 
 userScheme.plugin(passportLocalMongoose);
@@ -55,6 +58,19 @@ passport.use(new GoogleStrategy({
     });
   }
 ));
+
+passport.use(new FacebookStrategy({
+    clientID: process.env.FACEBOOK_CLIENT_ID,
+    clientSecret: process.env.FACEBOOK_CLIENT_SECRET,
+    callbackURL: "https://secrets-leungkakit.herokuapp.com/auth/facebook/secrets"
+  },
+  function(accessToken, refreshToken, profile, cb) {
+    User.findOrCreate({ facebookId: profile.id }, function (err, user) {
+      return cb(err, user);
+    });
+  }
+));
+
 
 app.route("/")
 .get(function (req, res) {
@@ -107,7 +123,7 @@ app.route("/register")
     }
     if(req.body.password === req.body.confirmPassword && req.body.password.length >= 8){
 
-    User.register({username: req.body.username}, req.body.password, function (err, user){  
+        User.register({username: req.body.username}, req.body.password, function (err, user){  
        
             if(err){
                 console.log(err);
@@ -143,12 +159,23 @@ app.route("/logout")
 app.get("/auth/google",
   passport.authenticate("google", { scope: ["profile"] }));
 
-  app.get("/auth/google/secrets", 
+app.get("/auth/google/secrets", 
   passport.authenticate("google", { failureRedirect: "/login" }),
   function(req, res) {
-    // Successful authentication, redirect home.
+    // Successful authentication, redirect secrets page.
     res.redirect("/secrets");
   });
+
+app.get("/auth/facebook",
+  passport.authenticate('facebook'));
+
+app.get("/auth/facebook/secrets",
+  passport.authenticate('facebook', { failureRedirect: '/login' }),
+  function(req, res) {
+    // Successful authentication, redirect secrets page.
+    res.redirect('/secrets');
+  });
+
 
 let port = process.env.PORT;
 if (port == null || port == "") {
