@@ -15,6 +15,15 @@ body {
   background-color: #000;
 }
 
-.google{
-  color: #fff;
+.thirdPartyLoginButton{
+  border-radius: 0.625rem;
+  top: 3.5rem;
+}
+
+.facebook{
+  margin-top: 2.7rem;
+}
+
+.verticalLine {
+  border-left: medium solid rgb(150, 145, 145);
 }
