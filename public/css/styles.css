@@ -1,18 +1,13 @@
-
-body {
-  background-color: #E8ECEF;
-}
-
 .centered {
-    padding-top: 200px;
-    text-align: center;
+  padding-top: 200px;
+  text-align: center;
 }
 
 .secret-text {
   text-align: center;
   font-size: 2rem;
   color: #fff;
-  background-color: #000;
+  background-color: #874C62;
 }
 
 .thirdPartyLoginButton{
@@ -26,4 +21,17 @@ body {
 
 .verticalLine {
   border-left: medium solid rgb(150, 145, 145);
+}
+
+.secretUserName{
+  text-align: center;
+  font-size: 1.5rem;
+  background-color: #F2D388;
+  color: #000;
+}
+
+footer{
+  display: flex; 
+  align-items: center; 
+  justify-content: center; 
 }

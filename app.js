@@ -30,11 +30,16 @@ app.use(passport.session());
 
 mongoose.connect("mongodb+srv://stevenkelvin:J3xEha3qYImOn6Tk@cluster0.jtqkgzp.mongodb.net/?retryWrites=true&w=majority", { useNewUrlParser: true });
 
+const secretsScheme = new mongoose.Schema({
+    _id: String
+});
+
 const userScheme = new mongoose.Schema({
     email: String,
     password: String,
     googleId: String,
-    facebookId: String
+    facebookId: String,
+    secret: [secretsScheme]
 });
 
 userScheme.plugin(passportLocalMongoose);
@@ -145,10 +150,16 @@ app.route("/register")
 
 app.route("/secrets")
 .get(function (req, res) {
-    if(req.isAuthenticated())
-        res.render("secrets");
-    else
-        res.redirect("/login");
+    User.find({"secret": {$ne: null}}, function (err, foundedUser){
+        if(err){
+            console.log(err);
+        }
+        else{
+            if(foundedUser){
+                res.render("secrets", {title: foundedUser , usersWithSecrets: foundedUser});
+            }
+        }
+    })
 });
 
 app.route("/logout")
@@ -159,6 +170,41 @@ app.route("/logout")
         }
     });
     
+});
+
+app.route("/submit")
+.get(function (req, res) {
+    if(req.isAuthenticated())
+        res.render("submit");
+    else
+        res.redirect("/login");
+})
+
+.post(function (req, res) {
+    const submittedSecret = req.body.secret;
+    let converedSecerts = "";
+
+    User.findById(req.user, function (err, foundedUser) {
+        if(err){
+            console.log(err);
+        }
+        if(foundedUser){
+            foundedUser.secret.push(submittedSecret);
+            foundedUser.save(function (err) {
+                if(!err){
+                    res.redirect("/secrets");
+                }
+                else{
+                    console.log(err);
+                }
+            });
+            for(let i = 0; i < foundedUser.secret.length; i++){
+                converedSecerts = foundedUser.secret[i]._id;
+                console.log(converedSecerts);
+            }
+            
+        }
+    })
 });
 
 app.get("/auth/google",
