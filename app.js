@@ -60,10 +60,11 @@ passport.serializeUser(function(user, done) {
 passport.use(new GoogleStrategy({
     clientID: process.env.GOOGLE_CLIENT_ID,
     clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-    callbackURL: "https://secrets-leungkakit.herokuapp.com/auth/google/secrets"
+    callbackURL: "https://secrets-leungkakit.herokuapp.com/auth/google/secrets",
+    profileFields: ['id', 'displayName', 'email']
   },
   function(accessToken, refreshToken, profile, cb) {
-    User.findOrCreate({ googleId: profile.id }, function (err, user) {
+    User.findOrCreate({ googleId: profile.id, username: profile.emails[0].value}, function (err, user) {
       return cb(err, user);
     });
   }
@@ -75,13 +76,11 @@ passport.use(new FacebookStrategy({
     callbackURL: "https://secrets-leungkakit.herokuapp.com/auth/facebook/secrets",
     profileFields: ['id', 'displayName', 'email']
   },
-  function (accessToken, refreshToken, profile, cb) {
-    console.log(profile.emails[0].value);
-    
-    User.findOrCreate({ facebookId: profile.id, username: profile.emails[0].value }, function (err, user) {
-            return cb(err, user);
-        });
-    }
+  function(accessToken, refreshToken, profile, cb) {
+    User.findOrCreate({ facebookId: profile.id, username: profile.emails[0].value}, function (err, user) {
+      return cb(err, user);
+    });
+  }
 ));
 
 
