@@ -26,8 +26,22 @@
 .secretUserName{
   text-align: center;
   font-size: 1.5rem;
-  background-color: #F2D388;
-  color: #000;
+  background-color: #9D5C0D;
+  color: #fff;
+}
+
+.googleUser{
+  text-align: center;
+  font-size: 1.5rem;
+  background-color: #C14C3C;
+  color: #fff;
+}
+
+.facebookUser{
+  text-align: center;
+  font-size: 1.5rem;
+  background-color: #475994;
+  color: #fff;
 }
 
 footer{
